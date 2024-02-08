@@ -154,8 +154,19 @@ function DataSourceWrapper(props) {
       log.time(TimingEnum.SEARCH_TO_LIST);
       const studies = await dataSource.query.studies.search(queryFilterValues);
 
+      // TODO fetch to see if we suspect hemorrage
+      // fake it for now for testing
+      // 2024.2.5 ICM
+      const studiesWithHemorrhage = studies.map((study: any) => {
+        return {
+          suspectedHemorrhage: Math.random() > 0.5,
+          ...study,
+        };
+      });
+      console.log({ studies, studiesWithHemorrhage });
+
       setData({
-        studies: studies || [],
+        studies: studiesWithHemorrhage || [],
         total: studies.length,
         resultsPerPage: queryFilterValues.resultsPerPage,
         pageNumber: queryFilterValues.pageNumber,

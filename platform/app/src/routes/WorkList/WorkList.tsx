@@ -93,7 +93,7 @@ function WorkList({
     studies.sort((s1, s2) => {
       if (shouldUseDefaultSort) {
         const ascendingSortModifier = -1;
-        return _sortStringDates(s1, s2, ascendingSortModifier);
+        return _sortBySuspectedHemorrhage(s1, s2, ascendingSortModifier);
       }
 
       const s1Prop = s1[sortBy];
@@ -250,6 +250,7 @@ function WorkList({
       patientName,
       date,
       time,
+      suspectedHemorrhage,
     } = study;
     const studyDate =
       date &&
@@ -263,6 +264,11 @@ function WorkList({
     return {
       dataCY: `studyRow-${studyInstanceUid}`,
       row: [
+        {
+          key: 'wlPriority',
+          content: <div className="suspectedHemorrhage">{suspectedHemorrhage ? '★' : ''}</div>,
+          gridCol: 2,
+        },
         {
           key: 'patientName',
           content: patientName ? (
@@ -603,6 +609,13 @@ function _getQueryFilterValues(params) {
   );
 
   return queryFilterValues;
+}
+
+function _sortBySuspectedHemorrhage(s1, s2, sortModifier: number): number {
+  if (s1.suspectedHemorrhage === s2.suspectedHemorrhage) {
+    return _sortStringDates(s1, s2, sortModifier);
+  }
+  return (s1.suspectedHemorrhage ? 1 : -1) * sortModifier;
 }
 
 function _sortStringDates(s1, s2, sortModifier) {
