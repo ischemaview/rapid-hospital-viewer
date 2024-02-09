@@ -163,6 +163,8 @@ function DataSourceWrapper(props) {
 
       // step 1 fetch the worklist
       // const wl = (await fetch('http://localhost:8080/dcm4chee-arc/aets/WORKLIST/rs/mwlitems')) || [];
+
+      // test data until fetch works
       const wl = [
         { studyInstanceUid: '1.3.6.1.4.1.39822.6316373097050288819774506516411971059016367130' },
       ];
