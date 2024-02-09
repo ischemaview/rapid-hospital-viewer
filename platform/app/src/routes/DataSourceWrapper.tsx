@@ -154,20 +154,48 @@ function DataSourceWrapper(props) {
       log.time(TimingEnum.SEARCH_TO_LIST);
       const studies = await dataSource.query.studies.search(queryFilterValues);
 
-      // TODO fetch to see if we suspect hemorrage
-      // fake it for now for testing
-      // 2024.2.5 ICM
-      const studiesWithHemorrhage = studies.map((study: any) => {
-        return {
-          suspectedHemorrhage: Math.random() > 0.5,
-          ...study,
-        };
+      /////////////////////////////////////////////////////
+      // TODO: Worklist Prioritization
+      // 2024.2.08
+      // Feel free to DM Isaac Marotte
+
+      const studiesWithHemorrhage = [];
+
+      // step 1 fetch the worklist
+      // const wl = (await fetch('http://localhost:8080/dcm4chee-arc/aets/WORKLIST/rs/mwlitems')) || [];
+      const wl = [
+        { studyInstanceUid: '1.3.6.1.4.1.39822.6316373097050288819774506516411971059016367130' },
+      ];
+
+      // we only want to display the worklist, so mak sure we filter the studies based on that
+      wl.forEach(item => {
+        // step 2: filter studies based on worklist results
+        const index = studies.findIndex(i => {
+          return true;
+          // return i.studyInstanceUid === item.studyInstanceUid;
+        });
+
+        if (index === -1) {
+          return;
+        }
+
+        // step 3: parse wl to see if there is a suspected hemorrhage
+        // the list will sort and star hemorrhages based on suspectedHemorrhage
+        const suspectedHemorrhage = Math.random() > 0.5;
+
+        // add to the list
+        studiesWithHemorrhage.push({
+          suspectedHemorrhage,
+          ...studies[index],
+        });
       });
-      console.log({ studies, studiesWithHemorrhage });
+
+      //
+      /////////////////////////////////////////////////////
 
       setData({
         studies: studiesWithHemorrhage || [],
-        total: studies.length,
+        total: studiesWithHemorrhage.length,
         resultsPerPage: queryFilterValues.resultsPerPage,
         pageNumber: queryFilterValues.pageNumber,
         location,
